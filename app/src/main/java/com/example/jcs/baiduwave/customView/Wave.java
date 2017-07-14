@@ -7,6 +7,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
@@ -87,19 +89,19 @@ public class Wave extends View {
         drawCenterText(canvas, textPaint, text);
         //上层的字
         textPaint.setColor(Color.WHITE);
-//        canvas.save(Canvas.CLIP_SAVE_FLAG);
-            //裁剪成圆形
-            Path o = new Path();
-            o.addCircle(mWidth / 2, mHeight / 2, mWidth / 2, Path.Direction.CCW);
-            canvas.clipPath(o);
-            //生成闭合波浪路径
-            path = getActionPath(currentPercent);
-            //画波浪
-            canvas.drawPath(path, mPaint);
-            //裁剪文字
-            canvas.clipPath(path);
-            drawCenterText(canvas, textPaint, text);
-//        canvas.restore();
+        //生成闭合波浪路径
+        path = getActionPath(currentPercent);
+        canvas.saveLayer(0,0,mWidth,mHeight,mPaint,Canvas.ALL_SAVE_FLAG);
+                //裁剪文字
+                canvas.clipPath(path);
+                //裁剪成圆形（SRC 源像素）
+                canvas.drawCircle(mWidth / 2, mHeight / 2, mWidth / 2, mPaint);
+                mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
+                //画波浪(DST 目标像素)
+                canvas.drawPath(path, mPaint);
+                mPaint.setXfermode(null);
+                drawCenterText(canvas, textPaint, text);
+        canvas.restore();
     }
 
     @Override
