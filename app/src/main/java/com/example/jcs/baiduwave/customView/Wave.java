@@ -7,8 +7,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
@@ -94,12 +92,8 @@ public class Wave extends View {
 
 		//裁剪文字
 		canvas.clipPath(path);
-		//裁剪成圆形（DST 目标像素）
+		//裁剪成圆形
 		canvas.drawCircle(mWidth / 2, mHeight / 2, mWidth / 2, mPaint);
-		mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
-		//画波浪(BaiduWave)
-		canvas.drawPath(path, mPaint);
-		mPaint.setXfermode(null);
 		drawCenterText(canvas, textPaint, text);
 	}
 
