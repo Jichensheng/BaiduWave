@@ -94,10 +94,10 @@ public class Wave extends View {
 
 		//裁剪文字
 		canvas.clipPath(path);
-		//裁剪成圆形（SRC 源像素）
+		//裁剪成圆形（DST 目标像素）
 		canvas.drawCircle(mWidth / 2, mHeight / 2, mWidth / 2, mPaint);
 		mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
-		//画波浪(DST 目标像素)
+		//画波浪(BaiduWave)
 		canvas.drawPath(path, mPaint);
 		mPaint.setXfermode(null);
 		drawCenterText(canvas, textPaint, text);
