@@ -90,9 +90,8 @@ public class Wave extends View {
 		//生成闭合波浪路径
 		path = getActionPath(currentPercent);
 
-		//裁剪文字
+		//裁剪成波浪形
 		canvas.clipPath(path);
-		//裁剪成圆形
 		canvas.drawCircle(mWidth / 2, mHeight / 2, mWidth / 2, mPaint);
 		drawCenterText(canvas, textPaint, text);
 	}
