@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">BaiduWave</string>
+    <string name="clip">1、Canvas的clip方式限制波浪边界</string>
+    <string name="xfermode">2、使用Xfermode方式限制波浪和圆形的边界</string>
+    <string name="shader_xfermode">3、用Xfermode方式限制白色文字\n用shader方式限制圆形的边界</string>
 </resources>

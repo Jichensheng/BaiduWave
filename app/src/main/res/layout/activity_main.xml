@@ -1,24 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/activity_main"
-    android:padding="20dp"
+    android:orientation="vertical"
+    android:gravity="center"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     >
-
-    <com.example.jcs.baiduwave.customView.Wave
+<TextView android:padding="5dp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/clip"/>
+   <com.example.jcs.baiduwave.customView.Wave
         android:id="@+id/wave"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:layout_centerHorizontal="true"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
         app:text="贴"/>
-
+    <TextView android:padding="5dp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/xfermode"/>
     <com.example.jcs.baiduwave.customView.WaveAntiAliased
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:layout_below="@+id/wave"
-        android:layout_centerHorizontal="true"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
         app:text="贴"/>
-</RelativeLayout>
+    <TextView android:padding="5dp"  android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/shader_xfermode"/>
+    <com.example.jcs.baiduwave.customView.WaveAntiAliased_Shader
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        app:text="贴"/>
+</LinearLayout>

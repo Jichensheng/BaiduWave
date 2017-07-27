@@ -4,6 +4,7 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
+import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -11,6 +12,7 @@ import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
+import android.graphics.Shader;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.view.View;
@@ -22,11 +24,9 @@ import com.example.jcs.baiduwave.tools.DimentionUtils;
 /**
  * author：Jics
  * 2017/7/27 10:45
- * 用Xfermode方式代替Canvas.clipPath裁剪来消除锯齿
- *
+ * 用Xfermode裁剪文字用shader方式限制圆形来消除锯齿
  */
-public class WaveAntiAliased extends View {
-	private PorterDuffXfermode xfermode = new PorterDuffXfermode(PorterDuff.Mode.SRC_IN);
+public class WaveAntiAliased_Shader extends View {
 	private PorterDuffXfermode xfermode_text = new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP);
 	private Paint mPaint;
 	private Paint textPaint;
@@ -37,18 +37,18 @@ public class WaveAntiAliased extends View {
 	private int color;
 	private String text = "贴";
 	private int textSize = DimentionUtils.sp2px(getContext(), 25);
-
 	private Bitmap bitmap;
+	private Canvas mCanvas;
 
-	public WaveAntiAliased(Context context) {
+	public WaveAntiAliased_Shader(Context context) {
 		this(context, null);
 	}
 
-	public WaveAntiAliased(Context context, AttributeSet attrs) {
+	public WaveAntiAliased_Shader(Context context, AttributeSet attrs) {
 		this(context, attrs, 0);
 	}
 
-	public WaveAntiAliased(Context context, AttributeSet attrs, int defStyleAttr) {
+	public WaveAntiAliased_Shader(Context context, AttributeSet attrs, int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
 		init(context, attrs);
 
@@ -60,6 +60,7 @@ public class WaveAntiAliased extends View {
 		color = array.getColor(R.styleable.Wave_color, Color.rgb(41, 163, 254));
 		text = array.getString(R.styleable.Wave_text);
 		array.recycle();
+
 		//图形及路径填充画笔
 		mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		mPaint.setStyle(Paint.Style.FILL);
@@ -69,6 +70,7 @@ public class WaveAntiAliased extends View {
 		textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		textPaint.setColor(Color.WHITE);
 		textPaint.setTypeface(Typeface.DEFAULT_BOLD);
+		textPaint.setXfermode(xfermode_text);
 		//闭合波浪路径
 		path = new Path();
 
@@ -93,40 +95,24 @@ public class WaveAntiAliased extends View {
 		//底部的字
 		textPaint.setColor(color);
 		drawCenterText(canvas, textPaint, text);
+		mPaint.setShader(getShaderBitmap());
+		canvas.drawCircle(mWidth / 2, mHeight / 2, mWidth / 2, mPaint);
+		mPaint.setShader(null);
+	}
+
+
+	private BitmapShader getShaderBitmap() {
+		bitmap.eraseColor(Color.TRANSPARENT);//把bitmap填充成透明色
 		//上层的字
 		textPaint.setColor(Color.WHITE);
 		//生成闭合波浪路径
 		path = getActionPath(currentPercent);
+		//绘制蓝色波浪
+		mCanvas.drawPath(path, mPaint);
 
-		//新建图层实现离屏缓冲
-		int flag = canvas.saveLayer(0, 0, canvas.getWidth(), canvas.getHeight(), null, Canvas.ALL_SAVE_FLAG);
-			//绘制蓝色波浪
-			canvas.drawPath(path, mPaint);
-			mPaint.setXfermode(xfermode);
-			//用带有SRC_IN模式的画笔绘制圆形图像，这样圆和波浪相交的地方就只显示圆了
-			canvas.drawBitmap(bitmap,0,0,mPaint);
-			textPaint.setXfermode(xfermode_text);
-			//用带有SRC_ATOP的文字画笔绘制文字，这样在圆形波浪和文字相交的地方绘制文字，在不相交的地方绘制圆形波浪
-			drawCenterText(canvas, textPaint, text);
-		//合并图层到canvas上
-		canvas.restoreToCount(flag);
+		drawCenterText(mCanvas, textPaint, text);
 
-		textPaint.setXfermode(null);
-		mPaint.setXfermode(null);
-	}
-
-	/**
-	 * 绘制圆形bitmap
-	 * @param width
-	 * @param height
-	 * @return
-	 */
-	private Bitmap getCircleBitmap(int width, int height){
-		Bitmap bitmap=Bitmap.createBitmap(width,height, Bitmap.Config.ARGB_8888);
-//		bitmap.eraseColor(Color.parseColor("#FF0000"));//填充颜色
-		Canvas canvas=new Canvas(bitmap);
-		canvas.drawCircle(width / 2, height / 2, width / 2, mPaint);
-		return bitmap;
+		return new BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
 	}
 
 	@Override
@@ -142,7 +128,8 @@ public class WaveAntiAliased extends View {
 			mHeight = heightSize;
 		}
 		setMeasuredDimension(mWidth, mHeight);
-		bitmap=getCircleBitmap(mWidth,mHeight);
+		bitmap= Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
+		mCanvas = new Canvas(bitmap);
 		textSize = mWidth / 2;
 		textPaint.setTextSize(textSize);
 	}
